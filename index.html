@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette Game</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="selected-player" id="selectedPlayer">
+            <h2>Turno de</h2>
+            <div class="player-info"></div>
+        </div>
+        
+        <div class="game-area">
+            <div class="roulette-container">
+                <div class="roulette" id="roulette"></div>
+                <div class="shooter" id="shooter">
+                    <img src="assets/shooter.png" alt="shooter">
+                </div>
+            </div>
+        </div>
+        <button id="spinButton" class="spin-button">SPIN ROULETTE</button>
+    </div>
+
+    <audio id="spinSound" src="assets/spin-sound.mp3"></audio>
+    <audio id="gunSound" src="assets/gunshot.mp3"></audio>
+
+    <script src="src/data.js"></script>
+    <script src="src/script.js"></script>
+</body>
+</html>
