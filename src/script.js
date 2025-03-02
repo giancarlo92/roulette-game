@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const roulette = document.getElementById('roulette');
     const spinButton = document.getElementById('spinButton');
+    const restartButton = document.getElementById('restartButton');
     const shooter = document.getElementById('shooter');
     const spinSound = document.getElementById('spinSound');
     const gunSound = document.getElementById('gunSound');
@@ -12,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the roulette with player slots
     function initializeRoulette() {
+        // Clear existing slots
+        roulette.innerHTML = '';
+        
         const angleStep = 360 / players.length;
         players.forEach((player, index) => {
             const slot = document.createElement('div');
@@ -44,13 +48,35 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedPlayer.classList.add('show');
     }
 
+    // Restart the game
+    function restartGame() {
+        // Reset all players to non-eliminated state
+        players.forEach(player => {
+            player.eliminated = false;
+        });
+
+        // Hide selected player display
+        selectedPlayer.classList.remove('show');
+
+        // Reset rotation
+        currentRotation = 0;
+        roulette.style.transform = `rotate(${currentRotation}deg)`;
+
+        // Re-initialize the roulette
+        initializeRoulette();
+
+        // Enable spin button
+        spinButton.disabled = false;
+        isSpinning = false;
+    }
+
     // Spin the roulette
     function spinRoulette() {
         if (isSpinning) return;
 
         const remainingPlayers = players.filter(player => !player.eliminated);
-        if (remainingPlayers.length < 2) {
-            alert('Game Over! Not enough players to continue.');
+        if (remainingPlayers.length === 0) {
+            alert('El juego ha terminado. ¡Todos los jugadores han sido eliminados!');
             return;
         }
 
@@ -77,11 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
             gunSound.currentTime = 0;
             gunSound.play();
 
-            // Calculate selected player
-            const angleStep = 360 / players.length;
+            // Calculate selected player from remaining players only
             const normalizedRotation = currentRotation % 360;
-            const selectedIndex = Math.floor((360 - (normalizedRotation % 360)) / angleStep);
-            const selectedPlayer = players[selectedIndex % players.length];
+            
+            // Map the rotation to an index in the remaining players array
+            const remainingPlayerIndex = Math.floor(Math.random() * remainingPlayers.length);
+            const selectedPlayer = remainingPlayers[remainingPlayerIndex];
 
             // Mark player as eliminated
             selectedPlayer.eliminated = true;
@@ -104,4 +131,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the game
     initializeRoulette();
     spinButton.addEventListener('click', spinRoulette);
+    restartButton.addEventListener('click', restartGame);
 });

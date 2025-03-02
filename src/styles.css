@@ -129,8 +129,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    display: block;
-    margin: 2rem auto;
+    margin: 0 0.5rem;
 }
 
 .spin-button:hover {
@@ -140,6 +139,22 @@ body {
 .spin-button:disabled {
     background-color: #666;
     cursor: not-allowed;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem auto;
+}
+
+.restart-button {
+    padding: 1rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 @keyframes death-animation {
