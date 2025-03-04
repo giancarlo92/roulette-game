@@ -7,9 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const gunSound = document.getElementById('gunSound');
     const selectedPlayer = document.getElementById('selectedPlayer');
     const playerInfo = selectedPlayer.querySelector('.player-info');
+    const fatalityContainer = document.getElementById('fatalityContainer');
 
     let isSpinning = false;
     let currentRotation = 0;
+    let hasSpunOnce = false;
 
     // Initialize the roulette with player slots
     function initializeRoulette() {
@@ -68,15 +70,33 @@ document.addEventListener('DOMContentLoaded', () => {
         // Enable spin button
         spinButton.disabled = false;
         isSpinning = false;
+        hasSpunOnce = false;
     }
 
+    // Show Fatality animation
+    function showFatalityAnimation() {
+        const remainingPlayers = players.filter(player => !player.eliminated);
+        fatalityContainer.classList.add('show');
+        // Hide fatality animation after 3 seconds
+        setTimeout(() => {
+            fatalityContainer.classList.remove('show');
+        }, 3000);
+    }
     // Spin the roulette
     function spinRoulette() {
         if (isSpinning) return;
+        performSpin();
+    }
+    
+    // Perform the actual spin animation
+    function performSpin() {
+        if (isSpinning) return;
 
         const remainingPlayers = players.filter(player => !player.eliminated);
+        // Show fatality animation for every eliminated player
         if (remainingPlayers.length === 0) {
-            alert('El juego ha terminado. ¡Todos los jugadores han sido eliminados!');
+            showFatalityAnimation();
+            spinButton.disabled = true;
             return;
         }
 
@@ -115,8 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedSlot = document.querySelector(`[data-player-id="${selectedPlayer.id}"]`);
             selectedSlot.classList.add('dead');
 
+            // Show blood splatter effect
+            const bloodSplatter = document.getElementById('bloodSplatter');
+            bloodSplatter.classList.add('show');
+            
             // Display selected player
             displaySelectedPlayer(selectedPlayer);
+            
+            // Remove blood splatter after animation
+            setTimeout(() => {
+                bloodSplatter.classList.remove('show');
+            }, 2000);
 
             // Reset state
             setTimeout(() => {

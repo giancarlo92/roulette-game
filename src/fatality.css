@@ -1,0 +1,89 @@
+/* Mortal Kombat Fatality Animation */
+@import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+
+.fatality-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.fatality-container.show {
+    opacity: 1;
+    visibility: visible;
+    animation: fatality-bg 2s ease-in-out;
+}
+
+.fatality-text {
+    font-family: 'Nosifer', cursive;
+    font-size: 8rem;
+    color: #ff0000;
+    text-shadow: 
+        0 0 10px #ff0000,
+        0 0 20px #ff0000,
+        0 0 30px #ff0000,
+        0 0 40px #800000;
+    letter-spacing: 5px;
+    position: relative;
+    transform: scale(0);
+    transition: transform 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+.fatality-container.show .fatality-text {
+    transform: scale(1);
+    animation: fatality-pulse 0.5s ease-in-out infinite alternate,
+               fatality-shake 0.1s ease-in-out infinite;
+}
+
+/* Blood drips from text */
+.fatality-text::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background-image: 
+        radial-gradient(circle at 10% 0, #ff0000 10px, transparent 10px),
+        radial-gradient(circle at 30% 0, #ff0000 15px, transparent 15px),
+        radial-gradient(circle at 50% 0, #ff0000 10px, transparent 10px),
+        radial-gradient(circle at 70% 0, #ff0000 12px, transparent 12px),
+        radial-gradient(circle at 90% 0, #ff0000 8px, transparent 8px);
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7));
+    animation: blood-drip 2s infinite;
+}
+
+@keyframes fatality-pulse {
+    0% { transform: scale(1); filter: brightness(1); }
+    100% { transform: scale(1.05); filter: brightness(1.2); }
+}
+
+@keyframes fatality-shake {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-2px, 2px) rotate(-1deg); }
+    50% { transform: translate(0, -2px) rotate(1deg); }
+    75% { transform: translate(2px, 2px) rotate(-0.5deg); }
+    100% { transform: translate(-2px, 0) rotate(1deg); }
+}
+
+@keyframes blood-drip {
+    0% { height: 20px; opacity: 0.9; }
+    50% { height: 40px; opacity: 1; }
+    100% { height: 20px; opacity: 0.9; }
+}
+
+@keyframes fatality-bg {
+    0% { background: rgba(0, 0, 0, 0.7); }
+    50% { background: rgba(80, 0, 0, 0.6); }
+    100% { background: rgba(0, 0, 0, 0.7); }
+}
