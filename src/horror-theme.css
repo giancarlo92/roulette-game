@@ -117,8 +117,8 @@ body::before {
     transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
     transform: rotate(0deg);
     border: 8px solid #3d0000;
-    background: #2a0000;
-    box-shadow: 0 0 30px rgba(255, 0, 0, 0.3), inset 0 0 50px rgba(0, 0, 0, 0.6);
+    background: radial-gradient(circle at center, #3a0000 0%, #2a0000 70%, #1a0000 100%);
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.3), inset 0 0 50px rgba(0, 0, 0, 0.8), 0 0 15px #ff0000;
 }
 
 .roulette::before {
@@ -146,6 +146,37 @@ body::before {
     align-items: center;
 }
 
+.player-slot .eliminate-button {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background-color: #6e0000;
+    border: 2px solid #ff0000;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.player-slot:hover .eliminate-button {
+    opacity: 1;
+}
+
+.player-slot .eliminate-button:hover {
+    background-color: #ff0000;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+}
+
 .player-slot img {
     width: 80px;
     height: 80px;
@@ -158,6 +189,10 @@ body::before {
 .player-slot.eliminated img {
     filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
     border-color: #ff0000;
+}
+
+.player-slot.eliminated .eliminate-button {
+    display: none;
 }
 
 .shooter {
@@ -276,20 +311,21 @@ body::before {
     pointer-events: none;
     width: 100%;
     height: 100%;
-    top: 150px;
+    top: 0;
     left: 0;
     z-index: 9999;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="1"/></filter></defs><g fill="%23800000"><path d="M90,50 Q120,20 140,45 T160,80 Q180,100 150,110 T100,130 Q70,150 60,120 T40,80 Q20,60 50,40 T90,50 Z" opacity="0.7" filter="url(%23blur)"/><path d="M70,30 Q90,10 110,25 T130,50 Q150,70 130,90 T90,100 Q60,110 50,90 T30,60 Q20,40 40,30 T70,30 Z" opacity="0.8"/><path d="M110,70 Q130,50 150,65 T170,90 Q190,110 160,120 T120,140 Q90,150 80,130 T60,100 Q40,80 70,60 T110,70 Z" opacity="0.6"/><g opacity="0.9"><circle cx="85" cy="65" r="4"/><circle cx="95" cy="75" r="3"/><circle cx="75" cy="85" r="5"/><circle cx="105" cy="55" r="2"/></g><g opacity="0.7"><path d="M120,90 Q130,80 140,85 T150,95 Q160,100 150,105 T130,110 Q120,115 115,105 T110,95 Q105,90 110,85 T120,90 Z"/><path d="M60,70 Q70,60 80,65 T90,75 Q100,80 90,85 T70,90 Q60,95 55,85 T50,75 Q45,70 50,65 T60,70 Z"/></g><g opacity="0.8"><ellipse cx="100" cy="100" rx="3" ry="5" transform="rotate(45,100,100)"/><ellipse cx="80" cy="120" rx="4" ry="2" transform="rotate(-30,80,120)"/><ellipse cx="130" cy="70" rx="2" ry="4" transform="rotate(15,130,70)"/></g></g></svg>');
-    background-size: 400px 400px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: radial-gradient(circle at center, rgba(128, 0, 0, 0.8) 0%, transparent 70%);
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="2"/></filter></defs><g fill="white"><path d="M90,50 Q120,20 140,45 T160,80 Q180,100 150,110 T100,130 Q70,150 60,120 T40,80 Q20,60 50,40 T90,50 Z" filter="url(%23blur)"/></g></svg>');
+    mask-size: 400px 400px;
+    mask-repeat: no-repeat;
+    mask-position: center;
     opacity: 0;
     transition: opacity 0.1s ease;
 }
 
 .blood-splatter.show {
     opacity: 1;
-    animation: fade-out 2s forwards;
+    animation: fade-out 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fade-out {
