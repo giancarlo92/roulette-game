@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedPlayer = document.getElementById('selectedPlayer');
     const playerInfo = selectedPlayer.querySelector('.player-info');
     const fatalityContainer = document.getElementById('fatalityContainer');
+    const bloodSplatter = document.getElementById('bloodSplatter');
 
     let isSpinning = false;
     let currentRotation = 0;
@@ -22,11 +23,66 @@ document.addEventListener('DOMContentLoaded', () => {
         players.forEach((player, index) => {
             const slot = document.createElement('div');
             slot.className = 'player-slot';
-            slot.innerHTML = `<img src="${player.image}" alt="${player.name}">`;
+            slot.innerHTML = `
+                <img src="${player.image}" alt="${player.name}">
+                <div class="eliminate-button" data-player-id="${player.id}">X</div>
+            `;
             slot.style.transform = `rotate(${angleStep * index}deg)`;
             slot.dataset.playerId = player.id;
             roulette.appendChild(slot);
+
+            // Add event listener to the eliminate button
+            const eliminateBtn = slot.querySelector('.eliminate-button');
+            eliminateBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                manuallyEliminatePlayer(player.id);
+            });
         });
+    }
+
+    // Manually eliminate a player
+    function manuallyEliminatePlayer(playerId) {
+        if (isSpinning) return;
+
+        const playerIndex = players.findIndex(p => p.id === playerId);
+        const player = players[playerIndex];
+        if (player && !player.eliminated) {
+            // Mark player as eliminated instead of removing from array
+            player.eliminated = true;
+            
+            // Find and update the player slot
+            const selectedSlot = document.querySelector(`.player-slot[data-player-id="${playerId}"]`);
+            if (selectedSlot) {
+                selectedSlot.classList.add('dead');
+
+                // Show blood splatter effect
+                bloodSplatter.classList.add('show');
+                
+                // Play gunshot sound
+                gunSound.currentTime = 0;
+                gunSound.play();
+                
+                // Add shooter animation
+                shooter.classList.add('shoot');
+                
+                // Remove blood splatter and shooter animation after animation
+                setTimeout(() => {
+                    bloodSplatter.classList.remove('show');
+                    shooter.classList.remove('shoot');
+                    selectedSlot.classList.add('eliminated');
+                    updatePlayerSlots();
+                }, 2000);
+
+                // Check if all players are eliminated
+                const remainingPlayers = players.filter(p => !p.eliminated);
+                if (remainingPlayers.length === 0) {
+                    setTimeout(() => {
+                        showFatalityAnimation();
+                        spinButton.disabled = true;
+                    }, 2500);
+                }
+            }
+        }
     }
 
     // Update player slots visual state
@@ -130,13 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const remainingPlayerIndex = Math.floor(Math.random() * remainingPlayers.length);
             const selectedPlayer = remainingPlayers[remainingPlayerIndex];
 
-            // Mark player as eliminated
+            // Mark the selected player as eliminated
             selectedPlayer.eliminated = true;
+            
             const selectedSlot = document.querySelector(`[data-player-id="${selectedPlayer.id}"]`);
             selectedSlot.classList.add('dead');
 
             // Show blood splatter effect
-            const bloodSplatter = document.getElementById('bloodSplatter');
             bloodSplatter.classList.add('show');
             
             // Display selected player
