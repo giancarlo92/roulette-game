@@ -191,6 +191,10 @@ body::before {
     border-color: #ff0000;
 }
 
+.player-slot.eliminated .eliminate-button {
+    display: none;
+}
+
 .shooter {
     transform: translateY(-50%);
     position: absolute;

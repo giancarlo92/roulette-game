@@ -53,6 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Find and update the player slot
             const selectedSlot = document.querySelector(`.player-slot[data-player-id="${playerId}"]`);
             if (selectedSlot) {
+                // Hide the eliminate button immediately
+                const eliminateBtn = selectedSlot.querySelector('.eliminate-button');
+                if (eliminateBtn) {
+                    eliminateBtn.style.display = 'none';
+                }
+                
                 selectedSlot.classList.add('dead');
 
                 // Show blood splatter effect
