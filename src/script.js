@@ -223,6 +223,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRotation = 0;
         roulette.style.transform = `rotate(${currentRotation}deg)`;
 
+        // Reset shooter position
+        shooter.classList.remove('exit');
+        shooter.classList.remove('shoot');
+
         // Re-initialize the roulette
         initializeRoulette();
 
@@ -237,10 +241,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function showFatalityAnimation() {
         const remainingPlayers = players.filter(player => !player.eliminated);
         fatalityContainer.classList.add('show');
+        // Hide selected player display when fatality is shown
+        selectedPlayer.classList.remove('show');
+        // Play fatality sound
+        const fatalitySound = document.getElementById('fatalitySound');
+        fatalitySound.currentTime = 0;
+        fatalitySound.play();
         // Hide fatality animation after 3 seconds
         setTimeout(() => {
             fatalityContainer.classList.remove('show');
+            // Call shooter exit animation after fatality animation completes
+            shooterExitAnimation();
         }, 3000);
+    }
+    
+    // Shooter exit animation
+    function shooterExitAnimation() {
+        // First rotate back to original position
+        shooter.classList.remove('shoot');
+        
+        // Add exit animation class after a longer delay to simulate walking
+        setTimeout(() => {
+            // Add exit class to trigger the animation
+            shooter.classList.add('exit');
+        }, 1000); // Increased from 500ms to 1000ms for a more natural pause before walking away
     }
     // Spin the roulette
     function spinRoulette() {

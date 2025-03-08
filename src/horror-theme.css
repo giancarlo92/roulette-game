@@ -203,19 +203,28 @@ body::before {
     position: absolute;
     right: 10%;
     top: 50%;
+    transition: right 3s ease-in-out; /* Increased from 1.5s to 3s for slower exit */
 }
 
 .shooter img {
     width: 250px;
     height: auto;
     transform: scaleX(-1);
-    transition: transform 0.2s ease;
+    transition: transform 0.5s ease; /* Increased from 0.2s to 0.5s for smoother rotation */
     filter: brightness(1.4) contrast(1.1) drop-shadow(0 0 15px rgba(255, 0, 0, 0.7));
 }
 
 .shooter.shoot img {
     transform: scaleX(-1) rotate(-15deg);
     filter: brightness(1.5) drop-shadow(0 0 15px rgba(255, 0, 0, 0.8));
+}
+
+.shooter.exit {
+    right: -30%;
+}
+
+.shooter.exit img {
+    transform: scaleX(1);
 }
 
 .spin-button {
