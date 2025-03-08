@@ -150,7 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const angleStep = 360 / remainingPlayers.length;
         let currentIndex = 0;
         
-        const slots = document.querySelectorAll('.player-slot');
+        // Sort slots by player ID to ensure consistent ordering
+        const slots = Array.from(document.querySelectorAll('.player-slot'));
+        
+        // Process non-eliminated players first
         slots.forEach(slot => {
             const playerId = parseInt(slot.dataset.playerId);
             const player = players.find(p => p.id === playerId);
@@ -158,9 +161,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!player.eliminated) {
                 // Add a transition for smooth animation
                 slot.style.transition = 'transform 1s ease-in-out';
-                // Set the new position
-                slot.style.transform = `rotate(${angleStep * currentIndex}deg)`;
+                // Set the new position with a small offset to prevent exact overlapping
+                const newRotation = angleStep * currentIndex;
+                slot.style.transform = `rotate(${newRotation}deg)`;
+                
+                // Reset the eliminate button's counter-rotation to ensure it stays upright
+                const eliminateBtn = slot.querySelector('.eliminate-button');
+                if (eliminateBtn) {
+                    eliminateBtn.style.transition = 'transform 1s ease-in-out';
+                    eliminateBtn.style.transform = `rotate(${-newRotation}deg)`;
+                }
+                
+                // Ensure each player slot has proper z-index to prevent hover issues
+                // Higher z-index for slots that appear later in the rotation
+                slot.style.zIndex = 10 + currentIndex;
+                
                 currentIndex++;
+            } else {
+                // Move eliminated players to a lower z-index
+                slot.style.zIndex = "5";
             }
         });
     }

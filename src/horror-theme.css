@@ -150,21 +150,24 @@ body::before {
     position: absolute;
     top: -5px;
     right: -5px;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background-color: #6e0000;
     border: 2px solid #ff0000;
     border-radius: 50%;
     color: #ffffff;
     font-size: 14px;
+    font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    opacity: 0;
+    opacity: 0.7;
     transition: all 0.3s ease;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-    z-index: 10;
+    z-index: 100;
+    /* Ensure the button doesn't rotate with the slot */
+    transform: rotate(0deg);
 }
 
 .player-slot:hover .eliminate-button {
