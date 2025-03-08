@@ -5,11 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const shooter = document.getElementById('shooter');
     const spinSound = document.getElementById('spinSound');
     const gunSound = document.getElementById('gunSound');
+    const restartSound = document.getElementById('restartSound');
     const selectedPlayer = document.getElementById('selectedPlayer');
     const playerInfo = selectedPlayer.querySelector('.player-info');
 
     let isSpinning = false;
     let currentRotation = 0;
+    let gameStarted = false; // Track if the game has started
+    let isProcessingElimination = false; // Flag to track if we're currently processing an elimination
 
     // Initialize the roulette with player slots
     function initializeRoulette() {
@@ -37,13 +40,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Disable all eliminate buttons
+    function disableAllEliminateButtons() {
+        const eliminateBtns = document.querySelectorAll('.eliminate-button');
+        eliminateBtns.forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.5';
+        });
+    }
+
+    // Enable all eliminate buttons
+    function enableAllEliminateButtons() {
+        const eliminateBtns = document.querySelectorAll('.eliminate-button');
+        eliminateBtns.forEach(btn => {
+            // Only enable buttons for non-eliminated players
+            const playerId = parseInt(btn.dataset.playerId);
+            const player = players.find(p => p.id === playerId);
+            if (player && !player.eliminated) {
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = ''; // Reset to default CSS value
+                btn.style.display = ''; // Reset display property
+            } else if (player && player.eliminated) {
+                // Ensure eliminated players' buttons stay hidden
+                btn.style.display = 'none';
+            }
+        });
+    }
+
     // Manually eliminate a player
     function manuallyEliminatePlayer(playerId) {
-        if (isSpinning) return;
+        if (isSpinning || isProcessingElimination) return;
 
         const playerIndex = players.findIndex(p => p.id === playerId);
         const player = players[playerIndex];
         if (player && !player.eliminated) {
+            // Set processing flag
+            isProcessingElimination = true;
+            
+            // Disable all eliminate buttons during the process
+            disableAllEliminateButtons();
+            
+            // Enable restart button after first manual elimination, just like after first spin
+            if (!gameStarted) {
+                gameStarted = true;
+                restartButton.disabled = false;
+            }
+            
             // Mark player as eliminated instead of removing from array
             player.eliminated = true;
             
@@ -70,6 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     shooter.classList.remove('shoot');
                     selectedSlot.classList.add('eliminated');
                     updatePlayerSlots();
+                    
+                    // Redistribute remaining players
+                    redistributePlayers();
+                    
+                    // Re-enable eliminate buttons after redistribution animation completes
+                    setTimeout(() => {
+                        isProcessingElimination = false;
+                        enableAllEliminateButtons();
+                    }, 1200); // Slightly longer than the redistribution animation (1s)
+                    
                 }, 2000);
 
                 // Check if all players are eliminated
@@ -82,6 +134,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+    }
+
+    // Redistribute players evenly around the wheel
+    function redistributePlayers() {
+        const remainingPlayers = players.filter(p => !p.eliminated);
+        if (remainingPlayers.length <= 1) return; // No need to redistribute if 0 or 1 player left
+        
+        const angleStep = 360 / remainingPlayers.length;
+        let currentIndex = 0;
+        
+        const slots = document.querySelectorAll('.player-slot');
+        slots.forEach(slot => {
+            const playerId = parseInt(slot.dataset.playerId);
+            const player = players.find(p => p.id === playerId);
+            
+            if (!player.eliminated) {
+                // Add a transition for smooth animation
+                slot.style.transition = 'transform 1s ease-in-out';
+                // Set the new position
+                slot.style.transform = `rotate(${angleStep * currentIndex}deg)`;
+                currentIndex++;
+            }
+        });
     }
 
     // Update player slots visual state
@@ -107,6 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Restart the game
     function restartGame() {
+        // Play restart sound
+        restartSound.currentTime = 0;
+        restartSound.play();
+        
         // Reset all players to non-eliminated state
         players.forEach(player => {
             player.eliminated = false;
@@ -122,9 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Re-initialize the roulette
         initializeRoulette();
 
-        // Enable spin button
+        // Enable spin button and disable restart button
         spinButton.disabled = false;
+        restartButton.disabled = true;
         isSpinning = false;
+        gameStarted = false; // Reset game started state
     }
 
     function showAnimation() {
@@ -146,6 +227,12 @@ document.addEventListener('DOMContentLoaded', () => {
             showAnimation();
             spinButton.disabled = true;
             return;
+        }
+
+        // Enable restart button after first spin
+        if (!gameStarted) {
+            gameStarted = true;
+            restartButton.disabled = false;
         }
 
         isSpinning = true;
@@ -181,6 +268,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Mark player as eliminated
             selectedPlayer.eliminated = true;
             const selectedSlot = document.querySelector(`[data-player-id="${selectedPlayer.id}"]`);
+            
+            // Hide the eliminate button immediately
+            const eliminateBtn = selectedSlot.querySelector('.eliminate-button');
+            if (eliminateBtn) {
+                eliminateBtn.style.display = 'none';
+            }
+            
             selectedSlot.classList.add('dead');
 
             // Display selected player
@@ -189,15 +283,26 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset state
             setTimeout(() => {
                 shooter.classList.remove('shoot');
+                selectedSlot.classList.add('eliminated');
                 updatePlayerSlots();
-                isSpinning = false;
-                spinButton.disabled = false;
+                
+                // Redistribute remaining players
+                redistributePlayers();
+                
+                // Re-enable eliminate buttons after redistribution
+                setTimeout(() => {
+                    isSpinning = false;
+                    spinButton.disabled = false;
+                    enableAllEliminateButtons();
+                }, 1200); // Slightly longer than the redistribution animation (1s)
             }, 1000);
         }, 4000);
     }
 
     // Initialize the game
     initializeRoulette();
+    // Disable restart button initially
+    restartButton.disabled = true;
     spinButton.addEventListener('click', spinRoulette);
     restartButton.addEventListener('click', restartGame);
 });
