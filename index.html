@@ -26,7 +26,7 @@
             <div class="roulette-container">
                 <div class="roulette" id="roulette"></div>
                 <div class="shooter" id="shooter">
-                    <img src="assets/shooter.png?v=' + version + '" alt="shooter">
+                    <img src="assets/shooter.png?v=" + version alt="shooter">
                 </div>
             </div>
         </div>
@@ -36,11 +36,14 @@
         </div>
     </div>
 
-    <audio id="spinSound" src="assets/spin-sound.mp3?v=' + version + '"></audio>
-    <audio id="gunSound" src="assets/gunshot.mp3?v=' + version + '"></audio>
-    <audio id="restartSound" src="assets/restart.mp3?v=' + version + '"></audio>
+    <audio id="spinSound"></audio>
+    <audio id="gunSound"></audio>
+    <audio id="restartSound"></audio>
 
     <script>
+        document.getElementById('spinSound').src = 'assets/spin-sound.mp3?v=' + version;
+        document.getElementById('gunSound').src = 'assets/gunshot.mp3?v=' + version;
+        document.getElementById('restartSound').src = 'assets/restart.mp3?v=' + version;
         document.write('<script src="src/data.js?v=' + version + '"><\/script>');
         document.write('<script src="src/script.js?v=' + version + '"><\/script>');
     </script>
