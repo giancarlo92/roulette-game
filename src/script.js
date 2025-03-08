@@ -20,11 +20,68 @@ document.addEventListener('DOMContentLoaded', () => {
         players.forEach((player, index) => {
             const slot = document.createElement('div');
             slot.className = 'player-slot';
-            slot.innerHTML = `<img src="${player.image}" alt="${player.name}">`;
+            slot.innerHTML = `
+                <img src="${player.image}" alt="${player.name}">
+                <div class="eliminate-button" data-player-id="${player.id}">X</div>
+            `;
             slot.style.transform = `rotate(${angleStep * index}deg)`;
             slot.dataset.playerId = player.id;
             roulette.appendChild(slot);
+
+            // Add event listener to the eliminate button
+            const eliminateBtn = slot.querySelector('.eliminate-button');
+            eliminateBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                manuallyEliminatePlayer(player.id);
+            });
         });
+    }
+
+    // Manually eliminate a player
+    function manuallyEliminatePlayer(playerId) {
+        if (isSpinning) return;
+
+        const playerIndex = players.findIndex(p => p.id === playerId);
+        const player = players[playerIndex];
+        if (player && !player.eliminated) {
+            // Mark player as eliminated instead of removing from array
+            player.eliminated = true;
+            
+            // Find and update the player slot
+            const selectedSlot = document.querySelector(`.player-slot[data-player-id="${playerId}"]`);
+            if (selectedSlot) {
+                // Hide the eliminate button immediately
+                const eliminateBtn = selectedSlot.querySelector('.eliminate-button');
+                if (eliminateBtn) {
+                    eliminateBtn.style.display = 'none';
+                }
+                
+                selectedSlot.classList.add('dead');
+                
+                // Play gunshot sound
+                gunSound.currentTime = 0;
+                gunSound.play();
+                
+                // Add shooter animation
+                shooter.classList.add('shoot');
+                
+                // Remove blood splatter and shooter animation after animation
+                setTimeout(() => {
+                    shooter.classList.remove('shoot');
+                    selectedSlot.classList.add('eliminated');
+                    updatePlayerSlots();
+                }, 2000);
+
+                // Check if all players are eliminated
+                const remainingPlayers = players.filter(p => !p.eliminated);
+                if (remainingPlayers.length === 0) {
+                    setTimeout(() => {
+                        showAnimation();
+                        spinButton.disabled = true;
+                    }, 2500);
+                }
+            }
+        }
     }
 
     // Update player slots visual state
@@ -70,13 +127,24 @@ document.addEventListener('DOMContentLoaded', () => {
         isSpinning = false;
     }
 
+    function showAnimation() {
+        alert('El juego ha terminado. ¡Todos los jugadores han sido eliminados!');
+    }
+
     // Spin the roulette
     function spinRoulette() {
+        if (isSpinning) return;
+        performSpin();
+    }
+    
+    // Perform the actual spin animation
+    function performSpin() {
         if (isSpinning) return;
 
         const remainingPlayers = players.filter(player => !player.eliminated);
         if (remainingPlayers.length === 0) {
-            alert('El juego ha terminado. ¡Todos los jugadores han sido eliminados!');
+            showAnimation();
+            spinButton.disabled = true;
             return;
         }
 
